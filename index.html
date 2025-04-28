@@ -1,135 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notebook</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7;
-            color: #333;
-        }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Notebook</title>
+ <style>
+  body {
+   font-family: 'Arial', sans-serif;
+   margin: 0;
+   padding: 0;
+   background-color: #f7f7f7;
+   color: #333;
+  }
 
-        .notebook-container {
-            width: 80%;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
+  .notebook-container {
+   width: 80%;
+   margin: 20px auto;
+   background-color: #fff;
+   padding: 20px;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   border-radius: 8px;
+  }
 
-        .notebook-container textarea {
-            width: 100%;
-            height: 150px;
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #e1e1e1;
-            border-radius: 4px;
-            resize: none;
-        }
+  .notebook-container textarea {
+   width: 100%;
+   height: 150px;
+   margin-bottom: 10px;
+   padding: 10px;
+   font-size: 16px;
+   border: 1px solid #e1e1e1;
+   border-radius: 4px;
+  }
 
-        .notebook-container button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+  .notebook-container button {
+   padding: 10px 20px;
+   margin-right: 10px;
+   border: none;
+   border-radius: 4px;
+   background-color: #5cb85c;
+   color: white;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+  }
 
-        .notebook-container button:hover {
-            background-color: #45a049;
-        }
+  .notebook-container button:hover {
+   background-color: #4cae4c;
+  }
 
-        .notes-list {
-            list-style: none;
-            padding: 0;
-        }
+  .notebook-container .undo-btn {
+   background-color: #f0ad4e;
+  }
 
-        .note-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #e1e1e1;
-        }
+  .notebook-container .undo-btn:hover {
+   background-color: #ec971f;
+  }
 
-        .note-item:last-child {
-            border-bottom: none;
-        }
+  .note-list {
+   list-style: none;
+   padding: 0;
+  }
 
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
+  .note-item {
+   background-color: #f9f9f9;
+   margin-top: 10px;
+   padding: 10px;
+   border: 1px solid #e1e1e1;
+   border-radius: 4px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+  }
 
-        .delete-btn:hover {
-            background-color: #d32f2f;
-        }
-    </style>
+  .delete-btn {
+   background-color: #d9534f;
+   color: white;
+   border: none;
+   border-radius: 4px;
+   padding: 5px 10px;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+  }
+
+  .delete-btn:hover {
+   background-color: #c9302c;
+  }
+ </style>
 </head>
 <body>
-    <div class="notebook-container">
-        <textarea id="noteContent" placeholder="Write your note..."></textarea>
-        <button id="saveNote">Save Note</button>
+ <div class="notebook-container">
+  <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+  <button id="saveBtn">Save Note</button>
+  <button id="undoDeleteBtn" class="undo-btn" style="display: none;">Undo Delete</button>
+  <ul id="notesList" class="note-list"></ul>
+ </div>
 
-        <ul id="notesList" class="notes-list">
-            <!-- Saved notes will be displayed here -->
-        </ul>
-    </div>
+ <script>
+  const saveBtn = document.getElementById('saveBtn');
+  const undoDeleteBtn = document.getElementById('undoDeleteBtn');
+  const noteContent = document.getElementById('noteContent');
+  const notesList = document.getElementById('notesList');
+  let notes = JSON.parse(localStorage.getItem('notes')) || [];
+  let deletedNote = null;
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const noteContent = document.getElementById('noteContent');
-            const notesList = document.getElementById('notesList');
+  function saveNote() {
+   const content = noteContent.value.trim();
+   if (content) {
+    notes.push(content);
+    localStorage.setItem('notes', JSON.stringify(notes));
+    addNoteToList(content);
+    noteContent.value = ''; // Clear the textarea
+   }
+  }
 
-            // Load notes from localStorage
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            notes.forEach(note => {
-                addNoteToList(note);
-            });
+  function addNoteToList(content) {
+   const li = document.createElement('li');
+   li.className = 'note-item';
+   li.innerHTML = `
+    <span>${content}</span>
+    <button class="delete-btn">Delete</button>
+   `;
+   notesList.appendChild(li);
 
-            document.getElementById('saveNote').addEventListener('click', function() {
-                const content = noteContent.value.trim();
-                if (content) {
-                    addNoteToList(content);
-                    notes.push(content);
-                    localStorage.setItem('notes', JSON.stringify(notes));
-                    noteContent.value = ''; // Clear the textarea
-                }
-            });
+   // Add event listener to the delete button
+   li.querySelector('.delete-btn').addEventListener('click', function() {
+    deletedNote = { content: content }; // Save the deleted note
+    notesList.removeChild(li);
+    const index = notes.indexOf(content);
+    if (index !== -1) {
+     notes.splice(index, 1);
+     localStorage.setItem('notes', JSON.stringify(notes));
+    }
+    undoDeleteBtn.style.display = 'inline-block'; // Show undo button
+   });
+  }
 
-            function addNoteToList(content) {
-                const li = document.createElement('li');
-                li.className = 'note-item';
-                li.innerHTML = `
-                    <span>${content}</span>
-                    <button class="delete-btn">Delete</button>
-                `;
-                notesList.appendChild(li);
+  function undoDelete() {
+   if (deletedNote) {
+    notes.push(deletedNote.content);
+    localStorage.setItem('notes', JSON.stringify(notes));
+    addNoteToList(deletedNote.content);
+    deletedNote = null;
+    undoDeleteBtn.style.display = 'none'; // Hide undo button
+   }
+  }
 
-                // Add event listener to the delete button
-                li.querySelector('.delete-btn').addEventListener('click', function() {
-                    notesList.removeChild(li);
-                    const index = notes.indexOf(content);
-                    if (index !== -1) {
-                        notes.splice(index, 1);
-                        localStorage.setItem('notes', JSON.stringify(notes));
-                    }
-                });
-            }
-        });
-    </script>
+  // Event listeners
+  saveBtn.addEventListener('click', saveNote);
+  undoDeleteBtn.addEventListener('click', undoDelete);
+
+  // Load notes from localStorage
+  notes.forEach(addNoteToList);
+ </script>
 </body>
 </html>
