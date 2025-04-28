@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebook</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .notebook-container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .notebook-container textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #e1e1e1;
+            border-radius: 4px;
+            resize: none;
+        }
+
+        .notebook-container button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .notebook-container button:hover {
+            background-color: #45a049;
+        }
+
+        .notes-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .note-item:last-child {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="notebook-container">
+        <textarea id="noteContent" placeholder="Write your note..."></textarea>
+        <button id="saveNote">Save Note</button>
+
+        <ul id="notesList" class="notes-list">
+            <!-- Saved notes will be displayed here -->
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const noteContent = document.getElementById('noteContent');
+            const notesList = document.getElementById('notesList');
+
+            // Load notes from localStorage
+            const notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes.forEach(note => {
+                addNoteToList(note);
+            });
+
+            document.getElementById('saveNote').addEventListener('click', function() {
+                const content = noteContent.value.trim();
+                if (content) {
+                    addNoteToList(content);
+                    notes.push(content);
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                    noteContent.value = ''; // Clear the textarea
+                }
+            });
+
+            function addNoteToList(content) {
+                const li = document.createElement('li');
+                li.className = 'note-item';
+                li.innerHTML = `
+                    <span>${content}</span>
+                    <button class="delete-btn">Delete</button>
+                `;
+                notesList.appendChild(li);
+
+                // Add event listener to the delete button
+                li.querySelector('.delete-btn').addEventListener('click', function() {
+                    notesList.removeChild(li);
+                    const index = notes.indexOf(content);
+                    if (index !== -1) {
+                        notes.splice(index, 1);
+                        localStorage.setItem('notes', JSON.stringify(notes));
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
