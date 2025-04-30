@@ -3,6 +3,8 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+ 
  <title>Notebook</title>
  <style>
   body {
@@ -20,6 +22,15 @@
    padding: 20px;
    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
    border-radius: 8px;
+  }
+
+  .notebook-header {
+   text-align: center;
+   margin-bottom: 20px;
+  }
+
+  .notebook-header h1 {
+   color: #333;
   }
 
   .notebook-container textarea {
@@ -79,6 +90,14 @@
    padding: 5px 10px;
    cursor: pointer;
    transition: background-color 0.3s ease;
+   position: relative;
+  }
+
+  .delete-btn::before {
+   content: "\f1f8";
+   font-family: "Font Awesome 5 Free";
+   font-weight: 900;
+   margin-right: 5px;
   }
 
   .delete-btn:hover {
@@ -88,6 +107,9 @@
 </head>
 <body>
  <div class="notebook-container">
+  <div class="notebook-header">
+   <h1>Notebook</h1>
+  </div>
   <textarea id="noteContent" placeholder="Write your note here..."></textarea>
   <button id="saveBtn">Save Note</button>
   <button id="undoDeleteBtn" class="undo-btn" style="display: none;">Undo Delete</button>
@@ -117,7 +139,7 @@
    li.className = 'note-item';
    li.innerHTML = `
     <span>${content}</span>
-    <button class="delete-btn">Delete</button>
+    <button class="delete-btn"></button>
    `;
    notesList.appendChild(li);
 
